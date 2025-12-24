@@ -1,289 +1,1472 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hudan Content Plan</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+import React, { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from "firebase/analytics"; // Ditambahkan sesuai titah
+import { 
+  getAuth, 
+  signInAnonymously, 
+  signInWithCustomToken,
+  onAuthStateChanged 
+} from 'firebase/auth';
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  deleteDoc, 
+  doc, 
+  updateDoc,
+  onSnapshot, 
+  query, 
+  orderBy 
+} from 'firebase/firestore';
+import { 
+  Copy, 
+  Trash2, 
+  Save, 
+  Wand2, 
+  Search, 
+  Filter, 
+  X, 
+  RefreshCw,
+  Dumbbell,
+  Video,
+  Image as ImageIcon,
+  Share2,
+  Zap,
+  Layout,
+  Palette,
+  Camera,
+  Calendar as CalendarIcon,
+  List as ListIcon, 
+  Plus,
+  Clock,
+  CheckCircle,
+  MoreVertical,
+  ChevronLeft,
+  ChevronRight,
+  PenTool,
+  AlertCircle,
+  Users
+} from 'lucide-react';
 
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #111827; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ea580c; }
-        body { background-color: #000; color: #fff; }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
+// --- Firebase Configuration ---
+let firebaseConfig;
+let currentAppId;
 
-    <script type="text/babel" data-type="module">
-        // --- IMPORTS ---
-        import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
-        import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
-        
-        // Firebase Imports
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { 
-            getAuth, signInAnonymously, onAuthStateChanged 
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { 
-            getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy 
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-        
-        // Icon Imports
-        import { 
-            Trash2, Wand2, RefreshCw, Dumbbell, Calendar as CalendarIcon, 
-            List as ListIcon, Plus, Zap, Layout, ChevronRight
-        } from 'https://esm.sh/lucide-react';
+// Konfigurasi Hudan Content Plan (Sesuai Titah Baginda)
+const bagindaConfig = {
+  apiKey: "AIzaSyDLoRJjfs9P9a5cvl90VtYHK7ZftW86rYI",
+  authDomain: "hudan-content-plan.firebaseapp.com",
+  projectId: "hudan-content-plan",
+  storageBucket: "hudan-content-plan.firebasestorage.app",
+  messagingSenderId: "712334443122",
+  appId: "1:712334443122:web:6a43f452504322bd1ef8eb",
+  measurementId: "G-DXQJ56VQW2"
+};
 
-        // --- KONFIGURASI FIREBASE BAGINDA ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDLoRJjfs9P9a5cvl90VtYHK7ZftW86rYI",
-            authDomain: "hudan-content-plan.firebaseapp.com",
-            projectId: "hudan-content-plan",
-            storageBucket: "hudan-content-plan.firebasestorage.app",
-            messagingSenderId: "712334443122",
-            appId: "1:712334443122:web:6a43f452504322bd1ef8eb",
-            measurementId: "G-DXQJ56VQW2"
-        };
+try {
+  // Logika Keamanan: Cek apakah berjalan di environment preview internal
+  if (typeof __firebase_config !== 'undefined') {
+    // Gunakan config internal agar Preview di Canvas tetap jalan
+    firebaseConfig = JSON.parse(__firebase_config);
+    currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+  } else {
+    // Gunakan config Baginda jika di-export atau di hosting sendiri
+    firebaseConfig = bagindaConfig;
+    currentAppId = 'hudan-content-plan';
+  }
+} catch (e) {
+  console.error("Firebase config parsing error", e);
+  firebaseConfig = bagindaConfig;
+  currentAppId = 'hudan-content-plan';
+}
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = "hudan-content-plan"; // ID Unik untuk koleksi database
+const app = initializeApp(firebaseConfig);
 
-        // --- KOMPONEN UI ---
+// Inisialisasi Analytics (dengan pengaman agar tidak crash di beberapa environment)
+let analytics;
+try {
+    if (typeof window !== 'undefined') {
+        analytics = getAnalytics(app);
+    }
+} catch (e) {
+    console.warn("Analytics failed to initialize:", e);
+}
 
-        const FormSelect = ({ label, name, value, options, onChange }) => (
-            <div className="relative group mb-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1">{label}</label>
-                <div className="relative">
-                <select 
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    className="w-full pl-4 pr-8 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-orange-500/50 rounded-xl text-sm focus:ring-2 focus:ring-orange-900 focus:border-orange-500 outline-none transition-all appearance-none text-gray-200 font-medium"
-                >
-                    {options}
-                </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-orange-500 transition-colors">
-                    <ChevronRight size={12} className="rotate-90" />
-                </div>
-                </div>
-            </div>
-        );
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = currentAppId;
 
-        const SectionHeader = ({ title, icon }) => (
-            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-700/50">
-                <div className="p-1.5 bg-gray-800 rounded-lg text-orange-500 shadow-sm border border-gray-700">
-                {icon}
-                </div>
-                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wide">{title}</h3>
-            </div>
-        );
+// --- Shared UI Components ---
 
-        const NavItem = ({ icon, label, active, onClick }) => (
-            <button 
-                onClick={onClick}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ease-out ${
-                active 
-                    ? 'bg-gray-800 text-white shadow-lg shadow-black/40 border border-gray-700 ring-1 ring-orange-500/50' 
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-            >
-                <span className={`${active ? 'text-orange-500' : ''}`}>{icon}</span>
-                <span className="font-bold text-xs uppercase tracking-wide hidden md:block">{label}</span>
-            </button>
-        );
+const FormSelect = ({ label, name, value, options, onChange }) => (
+  <div className="relative group">
+    <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1">{label}</label>
+    <div className="relative">
+      <select 
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full pl-4 pr-8 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-orange-500/50 rounded-xl text-sm focus:ring-2 focus:ring-orange-900 focus:border-orange-500 outline-none transition-all appearance-none text-gray-200 font-medium"
+      >
+        {options}
+      </select>
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-orange-500 transition-colors">
+        <ChevronRight size={12} className="rotate-90" />
+      </div>
+    </div>
+  </div>
+);
 
-        const NavigationTabs = ({ activeTab, setActiveTab }) => (
-            <nav className="flex items-center gap-2 bg-gray-900/80 p-1.5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-xl inline-flex overflow-x-auto max-w-full scrollbar-hide justify-center">
-                <NavItem icon={<Wand2 size={18} />} label="Generator" active={activeTab === 'generator'} onClick={() => setActiveTab('generator')} />
-                <NavItem icon={<ListIcon size={18} />} label="Content Plan" active={activeTab === 'plan'} onClick={() => setActiveTab('plan')} />
-                <NavItem icon={<CalendarIcon size={18} />} label="Calendar" active={activeTab === 'calendar'} onClick={() => setActiveTab('calendar')} />
-            </nav>
-        );
+const SectionHeader = ({ title, icon }) => (
+  <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-700/50">
+    <div className="p-1.5 bg-gray-800 rounded-lg text-orange-500 shadow-sm border border-gray-700">
+      {icon}
+    </div>
+    <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wide">{title}</h3>
+  </div>
+);
 
-        // --- MAIN APP ---
-        function App() {
-            const [user, setUser] = useState(null);
-            const [activeTab, setActiveTab] = useState('generator');
-            const [prompts, setPrompts] = useState([]);
-            const [generatedResult, setGeneratedResult] = useState(null);
-            const [isSaving, setIsSaving] = useState(false);
+const NavItem = ({ icon, label, active, onClick }) => (
+  <button 
+    onClick={onClick}
+    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ease-out ${
+      active 
+        ? 'bg-gray-800 text-white shadow-lg shadow-black/40 border border-gray-700 ring-1 ring-orange-500/50' 
+        : 'text-gray-400 hover:text-white hover:bg-white/5'
+    }`}
+  >
+    <span className={`${active ? 'text-orange-500' : ''}`}>{icon}</span>
+    <span className="font-bold text-xs uppercase tracking-wide">{label}</span>
+  </button>
+);
 
-            // State Form
-            const [formData, setFormData] = useState({
-                aiModel: 'Midjourney',
-                platform: 'Instagram/Facebook',
-                sportsCategory: 'Futsal',
-                subject: '',
-                athletePose: '',
-                mood: 'Intense',
-                visualStyle: 'Photorealistic',
-                contentStyle: 'Nike Ad Style',
-                lighting: 'Dramatic',
-                angle: 'Low Angle'
-            });
+const NavigationTabs = ({ activeTab, setActiveTab }) => (
+  <nav className="flex items-center gap-2 bg-gray-900/80 p-1.5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-xl inline-flex overflow-x-auto max-w-full scrollbar-hide">
+    <NavItem 
+      icon={<Wand2 size={18} />} 
+      label="Generator" 
+      active={activeTab === 'generator'} 
+      onClick={() => setActiveTab('generator')} 
+    />
+    <NavItem 
+      icon={<ListIcon size={18} />} 
+      label="Content Plan" 
+      active={activeTab === 'plan'} 
+      onClick={() => setActiveTab('plan')} 
+    />
+    <NavItem 
+      icon={<CalendarIcon size={18} />} 
+      label="Calendar" 
+      active={activeTab === 'calendar'} 
+      onClick={() => setActiveTab('calendar')} 
+    />
+  </nav>
+);
 
-            // Auth & Database Listener
-            useEffect(() => {
-                signInAnonymously(auth).then((cred) => setUser(cred.user)).catch(console.error);
-                
-                // Realtime Listener
-                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'));
-                const unsub = onSnapshot(q, (snapshot) => {
-                    const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    // Sort descending (terbaru di atas)
-                    data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    setPrompts(data);
-                }, (error) => {
-                    console.log("Database permission error:", error);
-                });
-                return () => unsub();
-            }, []);
+// --- VIEW COMPONENTS ---
 
-            const handleInputChange = (e) => {
-                setFormData({...formData, [e.target.name]: e.target.value});
-            };
-
-            const handleGenerate = () => {
-                const { subject, sportsCategory, mood, platform, aiModel, contentStyle } = formData;
-                // Logika Prompt Sederhana
-                const prompt = `/imagine prompt: ${subject}, ${sportsCategory} context, ${mood} atmosphere, ${contentStyle}, for ${platform} --v 6.0`;
-                
-                setGeneratedResult({
-                    singleLine: prompt,
-                    aiModel: aiModel,
-                    createdAt: new Date().toISOString()
-                });
-            };
-
-            const handleSave = async () => {
-                if(!generatedResult) return;
-                setIsSaving(true);
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'), {
-                        ...formData,
-                        fullPrompt: generatedResult.singleLine,
-                        status: 'Idea',
-                        scheduledDate: '',
-                        createdAt: new Date().toISOString()
-                    });
-                    setIsSaving(false);
-                    setActiveTab('plan'); // Pindah tab otomatis
-                } catch(e) {
-                    console.error("Error saving:", e);
-                    alert("Gagal menyimpan. Pastikan Rules Firebase sudah diatur.");
-                    setIsSaving(false);
-                }
-            };
-
-            return (
-                <div className="w-full min-h-screen font-sans bg-black text-gray-200 p-4 md:p-8">
-                    <div className="max-w-5xl mx-auto">
-                        {/* Header */}
-                        <div className="text-center mb-8">
-                            <div className="flex items-center justify-center gap-3 mb-4">
-                                <div className="p-3 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl shadow-lg">
-                                    <Dumbbell className="text-white" size={32} />
-                                </div>
-                                <div className="text-left">
-                                    <h1 className="text-2xl font-black tracking-tighter text-white">HUDAN <span className="text-orange-500">CONTENT</span></h1>
-                                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Plan & Generator</p>
-                                </div>
-                            </div>
-                            <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+// 1. Generator View
+const GeneratorView = ({ formData, handleInputChange, handleGenerate, generatedResult, isSaving, handleSave, copyToClipboard }) => {
+    return (
+        <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                 {/* Form */}
+                <div className="lg:col-span-7 space-y-6">
+                      <div className="bg-gray-900/80 backdrop-blur-lg rounded-[2rem] shadow-2xl border border-white/5 p-6 md:p-8 relative overflow-hidden">
+                        
+                        {/* Core Settings */}
+                        <div>
+                        <SectionHeader title="Core Strategy" icon={<Zap size={16} />} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormSelect 
+                            label="AI Model"
+                            name="aiModel"
+                            value={formData.aiModel}
+                            onChange={handleInputChange}
+                            options={
+                                <>
+                                <option value="">Pilih Model...</option>
+                                <optgroup label="🖼️ Image Generators">
+                                    <option value="Midjourney">Midjourney (v6)</option>
+                                    <option value="Stable Diffusion">Stable Diffusion XL</option>
+                                    <option value="DALL-E">DALL-E 3</option>
+                                    <option value="Flux">Flux.1</option>
+                                    <option value="Gemini">Gemini Image</option>
+                                    <option value="Leonardo">Leonardo AI</option>
+                                </optgroup>
+                                <optgroup label="🎬 Video Generators">
+                                    <option value="Sora">Sora</option>
+                                    <option value="Veo">Veo</option>
+                                    <option value="Pika">Pika Labs</option>
+                                    <option value="Runway">Runway Gen-3</option>
+                                    <option value="Luma">Luma Dream Machine</option>
+                                    <option value="Kling">Kling AI</option>
+                                </optgroup>
+                                </>
+                            }
+                            />
+                            <FormSelect 
+                            label="Format"
+                            name="platform"
+                            value={formData.platform}
+                            onChange={handleInputChange}
+                            options={
+                                <>
+                                <option value="">Pilih Format...</option>
+                                <option value="Instagram/Facebook">Instagram Feed (1:1)</option>
+                                <option value="Instagram Portrait">Instagram Portrait (4:5)</option>
+                                <option value="TikTok/Reels">Stories/Reels (9:16)</option>
+                                <option value="YouTube Sports">YouTube Landscape (16:9)</option>
+                                <option value="Twitter/X">Twitter Post (16:9)</option>
+                                <option value="Website/Blog">Website Hero Header (21:9)</option>
+                                <option value="LinkedIn">LinkedIn Post (Landscape)</option>
+                                <option value="Billboard">Digital Billboard (Ultra Wide)</option>
+                                </>
+                            }
+                            />
+                        </div>
                         </div>
 
-                        {/* TAB: GENERATOR */}
-                        {activeTab === 'generator' && (
-                            <div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
-                                    <SectionHeader title="Konfigurasi" icon={<Zap size={16}/>} />
-                                    
-                                    <FormSelect label="Kategori" name="sportsCategory" value={formData.sportsCategory} onChange={handleInputChange} 
-                                        options={<><option>Futsal</option><option>Sepak Bola</option><option>Gym/Fitness</option></>} 
-                                    />
-                                    <FormSelect label="Mood" name="mood" value={formData.mood} onChange={handleInputChange} 
-                                        options={<><option>Intense</option><option>Victory</option><option>Dark</option></>} 
-                                    />
-                                    
-                                    <div className="mb-4">
-                                        <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1">Subjek</label>
-                                        <textarea name="subject" onChange={handleInputChange} value={formData.subject} rows="3" className="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-sm focus:border-orange-500 outline-none" placeholder="Deskripsikan ide konten..."></textarea>
-                                    </div>
+                        {/* Context */}
+                        <div className="mt-8 bg-black/20 p-6 rounded-2xl border border-white/5">
+                             <SectionHeader title="Sport Context" icon={<Layout size={16} />} />
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <FormSelect 
+                                label="Category"
+                                name="sportsCategory"
+                                value={formData.sportsCategory}
+                                onChange={handleInputChange}
+                                options={
+                                    <>
+                                    <option value="">Pilih Cabang...</option>
+                                    <optgroup label="⚽ Team Sports (Major)">
+                                        <option value="Football/Soccer">Football / Soccer</option>
+                                        <option value="Basketball">Basketball</option>
+                                        <option value="Volleyball">Volleyball</option>
+                                        <option value="Rugby">Rugby Union / League</option>
+                                        <option value="American Football">American Football</option>
+                                        <option value="Baseball">Baseball</option>
+                                        <option value="Ice Hockey">Ice Hockey</option>
+                                        <option value="Cricket">Cricket</option>
+                                        <option value="Handball">Handball</option>
+                                        <option value="Lacrosse">Lacrosse</option>
+                                    </optgroup>
+                                    <optgroup label="🎾 Racquet Sports">
+                                        <option value="Tennis">Tennis</option>
+                                        <option value="Padel">Padel</option>
+                                        <option value="Badminton">Badminton</option>
+                                        <option value="Squash">Squash</option>
+                                        <option value="Pickleball">Pickleball</option>
+                                        <option value="Table Tennis">Table Tennis</option>
+                                    </optgroup>
+                                    <optgroup label="🥊 Combat Sports">
+                                        <option value="Boxing">Boxing</option>
+                                        <option value="MMA">MMA / UFC</option>
+                                        <option value="Muay Thai">Muay Thai</option>
+                                        <option value="Karate">Karate</option>
+                                        <option value="Taekwondo">Taekwondo</option>
+                                        <option value="Judo">Judo</option>
+                                        <option value="BJJ">Brazilian Jiu-Jitsu</option>
+                                        <option value="Wrestling">Wrestling</option>
+                                        <option value="Fencing">Fencing</option>
+                                    </optgroup>
+                                    <optgroup label="🏃 Athletics & Precision">
+                                        <option value="Track and Field">Track & Field (Sprint/Jump)</option>
+                                        <option value="Marathon">Marathon</option>
+                                        <option value="Golf">Golf</option>
+                                        <option value="Archery">Archery</option>
+                                        <option value="Shooting">Shooting Sport</option>
+                                        <option value="Bowling">Bowling</option>
+                                        <option value="Snooker/Pool">Snooker / Pool</option>
+                                    </optgroup>
+                                    <optgroup label="🏎️ Motor Sports">
+                                        <option value="Formula 1">Formula 1</option>
+                                        <option value="MotoGP">MotoGP</option>
+                                        <option value="Motocross">Motocross</option>
+                                        <option value="Rally Car">Rally Car</option>
+                                        <option value="NASCAR">NASCAR</option>
+                                        <option value="Drift">Drift Racing</option>
+                                        <option value="Karting">Go-Karting</option>
+                                    </optgroup>
+                                    <optgroup label="🌊 Water Sports">
+                                        <option value="Swimming">Swimming</option>
+                                        <option value="Surfing">Surfing</option>
+                                        <option value="Diving">Diving</option>
+                                        <option value="Water Polo">Water Polo</option>
+                                        <option value="Rowing">Rowing / Kayaking</option>
+                                        <option value="Sailing">Sailing</option>
+                                        <option value="Kite Surfing">Kite Surfing</option>
+                                    </optgroup>
+                                    <optgroup label="🏂 Extreme/Winter">
+                                        <option value="Skateboarding">Skateboarding</option>
+                                        <option value="Snowboarding">Snowboarding</option>
+                                        <option value="Skiing">Skiing</option>
+                                        <option value="BMX">BMX Freestyle</option>
+                                        <option value="Parkour">Parkour</option>
+                                        <option value="Rock Climbing">Rock Climbing</option>
+                                        <option value="Ice Skating">Figure Skating</option>
+                                    </optgroup>
+                                    <optgroup label="🚴 Cycling">
+                                        <option value="Road Cycling">Road Cycling</option>
+                                        <option value="Mountain Biking">Mountain Biking (MTB)</option>
+                                        <option value="Track Cycling">Track Cycling (Velodrome)</option>
+                                    </optgroup>
+                                    <optgroup label="💪 Fitness & Gymnastics">
+                                        <option value="Gym/Bodybuilding">Bodybuilding</option>
+                                        <option value="CrossFit">CrossFit</option>
+                                        <option value="Yoga">Yoga / Pilates</option>
+                                        <option value="Calisthenics">Calisthenics</option>
+                                        <option value="Artistic Gymnastics">Artistic Gymnastics</option>
+                                        <option value="Rhythmic Gymnastics">Rhythmic Gymnastics</option>
+                                    </optgroup>
+                                    <optgroup label="🎮 Other">
+                                        <option value="E-Sports">E-Sports</option>
+                                        <option value="Chess">Chess</option>
+                                    </optgroup>
+                                    </>
+                                }
+                                />
+                                <FormSelect 
+                                label="Pose / Action"
+                                name="athletePose"
+                                value={formData.athletePose}
+                                onChange={handleInputChange}
+                                options={
+                                    <>
+                                    <option value="">Pilih Pose...</option>
+                                    <optgroup label="Football (Soccer)">
+                                        <option value="Kicking Ball">Power Shot</option>
+                                        <option value="Dribbling">High Speed Dribbling</option>
+                                        <option value="Header">Flying Header</option>
+                                        <option value="Bicycle Kick">Bicycle Kick</option>
+                                        <option value="Goalkeeper Diving">Goalkeeper Diving Save</option>
+                                        <option value="Tackle">Sliding Tackle</option>
+                                        <option value="Free Kick">Free Kick Stance</option>
+                                    </optgroup>
+                                    <optgroup label="Basketball">
+                                        <option value="Shooting Jump Shot">Jump Shot</option>
+                                        <option value="Dunking">Tomahawk Dunk</option>
+                                        <option value="Crossover">Ankle Breaker Crossover</option>
+                                        <option value="Defense">Low Defensive Stance</option>
+                                        <option value="Alley-oop">Alley-oop Finish</option>
+                                        <option value="Free Throw">Free Throw Focus</option>
+                                    </optgroup>
+                                    <optgroup label="Racquet (Tennis/Padel/Badminton)">
+                                        <option value="Serve">Service Motion</option>
+                                        <option value="Forehand">Powerful Forehand</option>
+                                        <option value="Backhand">Backhand Slice/Drive</option>
+                                        <option value="Bandeja">Padel Bandeja</option>
+                                        <option value="Vibora">Padel Vibora</option>
+                                        <option value="Smash">Overhead Smash</option>
+                                        <option value="Volley">Net Volley</option>
+                                    </optgroup>
+                                    <optgroup label="Combat (Boxing/MMA)">
+                                        <option value="Punch">Throwing Cross/Jab</option>
+                                        <option value="Uppercut">Uppercut Impact</option>
+                                        <option value="Kick">High Kick / Roundhouse</option>
+                                        <option value="Knee Strike">Flying Knee</option>
+                                        <option value="Grappling">Grappling / Takedown</option>
+                                        <option value="Submission">Armbar / Choke</option>
+                                        <option value="Face-off">Intense Face-off</option>
+                                    </optgroup>
+                                    <optgroup label="Precision (Golf/Archery)">
+                                        <option value="Golf Swing">Full Golf Swing</option>
+                                        <option value="Putting">Putting Focus</option>
+                                        <option value="Archery Aim">Drawing Bow / Aiming</option>
+                                        <option value="Release">Release Follow Through</option>
+                                    </optgroup>
+                                    <optgroup label="Athletics & Gymnastics">
+                                        <option value="Sprint Start">Starting Block Position</option>
+                                        <option value="Sprinting">Full Sprint Motion</option>
+                                        <option value="High Jump">Fosbury Flop (High Jump)</option>
+                                        <option value="Handstand">Handstand / Balance</option>
+                                        <option value="Split">Split Leap</option>
+                                        <option value="Rings">Iron Cross (Rings)</option>
+                                    </optgroup>
+                                    <optgroup label="Motor Sports">
+                                        <option value="Cornering">Knee Dragging Corner</option>
+                                        <option value="Wheelie">Wheelie</option>
+                                        <option value="Drifting">Drifting (Smoke)</option>
+                                        <option value="Pit Stop">Pit Stop Action</option>
+                                        <option value="Overtake">Overtaking Maneuver</option>
+                                    </optgroup>
+                                    <optgroup label="Water/Extreme">
+                                        <option value="Barrel">Inside the Barrel (Surf)</option>
+                                        <option value="Start">Diving Start (Swim)</option>
+                                        <option value="Ollie">Ollie / Kickflip (Skate)</option>
+                                        <option value="Grind">Rail Grind</option>
+                                        <option value="Backflip">Backflip (Moto/Ski)</option>
+                                        <option value="Carving">Carving Snow</option>
+                                    </optgroup>
+                                    <optgroup label="Fitness/Generic">
+                                        <option value="Deadlift">Heavy Deadlift</option>
+                                        <option value="Squat">Squat Depth</option>
+                                        <option value="Running">Jogging/Running</option>
+                                        <option value="Meditation">Meditation/Lotus</option>
+                                        <option value="Stretching">Stretching</option>
+                                        <option value="Victory Pose">Arms Raised Victory</option>
+                                        <option value="Trophy Lift">Lifting Trophy</option>
+                                    </optgroup>
+                                    </>
+                                }
+                                />
+                             </div>
 
-                                    <button onClick={handleGenerate} className="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl font-bold text-white shadow-lg hover:shadow-orange-900/50 transition-all flex items-center justify-center gap-2">
-                                        <Wand2 size={20} /> Generate Prompt
-                                    </button>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {generatedResult ? (
-                                        <div className="bg-gray-800 p-6 rounded-3xl border border-gray-700">
-                                            <div className="text-green-400 text-xs font-bold mb-2 uppercase">Result Ready</div>
-                                            <code className="block bg-black/40 p-4 rounded-xl text-green-300 text-sm font-mono break-words mb-4">
-                                                {generatedResult.singleLine}
-                                            </code>
-                                            <button onClick={handleSave} disabled={isSaving} className="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-bold text-white flex justify-center items-center gap-2">
-                                                {isSaving ? <RefreshCw className="animate-spin"/> : <Plus/>} Simpan ke Plan
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="h-full border-2 border-dashed border-gray-800 rounded-3xl flex flex-col items-center justify-center text-gray-600 p-8">
-                                            <Dumbbell size={40} className="mb-4 opacity-20"/>
-                                            <p className="text-sm">Prompt akan muncul di sini</p>
-                                        </div>
-                                    )}
-                                </div>
+                             {/* Action Type Details */}
+                             <div className="mb-4">
+                                <FormSelect 
+                                    label="Action Type"
+                                    name="actionType"
+                                    value={formData.actionType}
+                                    onChange={handleInputChange}
+                                    options={
+                                    <>
+                                        <option value="">Jenis Aksi...</option>
+                                        <optgroup label="In-Game Action">
+                                            <option value="Action Shot">⚡ High Speed Action</option>
+                                            <option value="Celebration Moment">🎉 Emotional Celebration</option>
+                                            <option value="Slow Motion">🎬 Cinematic Slow Motion</option>
+                                            <option value="POV">👀 POV (First Person)</option>
+                                            <option value="Wide Angle">📐 Wide Arena View</option>
+                                        </optgroup>
+                                        <optgroup label="Commercial & Editorial">
+                                            <option value="Portrait">📸 Dramatic Portrait</option>
+                                            <option value="Product Shot">👟 Product/Gear Focus</option>
+                                            <option value="Fashion">👗 Sports Fashion/Lifestyle</option>
+                                            <option value="Studio">💡 Studio Photoshoot</option>
+                                        </optgroup>
+                                        <optgroup label="Behind The Scenes">
+                                            <option value="Training Session">💪 Gritty Training</option>
+                                            <option value="Locker Room">🚪 Locker Room Focus</option>
+                                            <option value="Press Conference">🎙️ Press Conference</option>
+                                            <option value="Medical">🏥 Rehab / Medical Check</option>
+                                            <option value="Strategy">📋 Tactical Board / Strategy</option>
+                                        </optgroup>
+                                        <optgroup label="Fan & Atmosphere">
+                                            <option value="Fan Interaction">🤝 Fan Interaction</option>
+                                            <option value="Crowd">🏟️ Crowd/Ultras</option>
+                                            <option value="Silhouette">🌑 Silhouette</option>
+                                        </optgroup>
+                                    </>
+                                    }
+                                />
+                             </div>
+                             
+                             <div className="relative">
+                                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2 ml-1">Detail Subject</label>
+                                <textarea
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleInputChange}
+                                    rows={2}
+                                    placeholder="Contoh: Atlet muda memakai jersey brand kita, latar belakang stadium futuristik..."
+                                    className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-xl focus:ring-2 focus:ring-orange-900 focus:border-orange-500 outline-none transition-all resize-none text-gray-200 text-sm placeholder-gray-600"
+                                ></textarea>
                             </div>
-                        )}
+                        </div>
 
-                        {/* TAB: CONTENT PLAN (DATABASE) */}
-                        {activeTab === 'plan' && (
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {prompts.map(p => (
-                                        <div key={p.id} className="bg-gray-900 border border-gray-800 p-5 rounded-2xl hover:border-orange-500/30 transition-all group">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-[10px] font-bold uppercase bg-gray-800 px-2 py-1 rounded text-gray-400 border border-gray-700">{p.status || 'Idea'}</span>
-                                                <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'prompts', p.id))} className="text-gray-600 hover:text-red-500"><Trash2 size={14}/></button>
-                                            </div>
-                                            <h3 className="font-bold text-white mb-1 line-clamp-1">{p.subject || "Tanpa Judul"}</h3>
-                                            <p className="text-xs text-gray-500 line-clamp-2 mb-3 font-mono bg-black/20 p-2 rounded">{p.fullPrompt}</p>
-                                            <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                                                <Layout size={10}/> {p.platform}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {prompts.length === 0 && (
-                                        <div className="col-span-full text-center py-20 text-gray-600">Belum ada data di database.</div>
-                                    )}
+                        {/* Styles & Visuals - Full Options Restored */}
+                        <div className="mt-8">
+                             <SectionHeader title="Visual Style" icon={<Palette size={16} />} />
+                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                <FormSelect
+                                    label="Content Style"
+                                    name="contentStyle" 
+                                    value={formData.contentStyle} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Content Style...</option>
+                                            <optgroup label="Professional">
+                                                <option value="Sports Photography">Pro Sports Photo</option>
+                                                <option value="Cinematic">Cinematic Film</option>
+                                                <option value="Editorial">Editorial/Magazine</option>
+                                                <option value="Documentary">Documentary</option>
+                                                <option value="Journalism">Photojournalism</option>
+                                            </optgroup>
+                                            <optgroup label="Branded">
+                                                <option value="Nike Ad Style">Nike Style (High Contrast)</option>
+                                                <option value="Adidas">Adidas Urban</option>
+                                                <option value="Under Armour">Under Armour Gritty</option>
+                                                <option value="Red Bull">Red Bull Extreme</option>
+                                                <option value="Luxury">Luxury Fashion</option>
+                                            </optgroup>
+                                            <optgroup label="Artistic">
+                                                <option value="Retro 90s">Retro 90s (VHS)</option>
+                                                <option value="Cyberpunk">Cyberpunk/Neon</option>
+                                                <option value="Minimalist">Minimalist</option>
+                                                <option value="Vaporwave">Vaporwave</option>
+                                                <option value="Noir">Film Noir (B&W)</option>
+                                                <option value="Grunge">Grunge</option>
+                                            </optgroup>
+                                        </>
+                                    }
+                                />
+                                <FormSelect
+                                    label="Visual/Render"
+                                    name="visualStyle" 
+                                    value={formData.visualStyle} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Visual/Render...</option>
+                                            <optgroup label="Realistic">
+                                                <option value="Photorealistic">Photorealistic</option>
+                                                <option value="Hyperrealistic">Hyperrealistic</option>
+                                                <option value="Raw">RAW Photo</option>
+                                            </optgroup>
+                                            <optgroup label="3D/CGI">
+                                                <option value="3D Render">3D Render (Pixar)</option>
+                                                <option value="Unreal Engine">Unreal Engine 5</option>
+                                                <option value="Octane Render">Octane Render</option>
+                                                <option value="Low Poly">Low Poly</option>
+                                                <option value="Voxel">Voxel Art</option>
+                                            </optgroup>
+                                            <optgroup label="Illustration">
+                                                <option value="Illustration">Vector Illustration</option>
+                                                <option value="Anime">Anime / Manga</option>
+                                                <option value="Comic">Comic Book</option>
+                                                <option value="Oil Painting">Oil Painting</option>
+                                                <option value="Sketch">Pencil Sketch</option>
+                                                <option value="Watercolor">Watercolor</option>
+                                                <option value="Pixel Art">Pixel Art</option>
+                                                <option value="Glitch">Glitch Art</option>
+                                                <option value="Double Exposure">Double Exposure</option>
+                                            </optgroup>
+                                        </>
+                                    }
+                                />
+                                <FormSelect
+                                    label="Lighting"
+                                    name="lighting" 
+                                    value={formData.lighting} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Lighting...</option>
+                                            <option value="Stadium Lights">Stadium Lights</option>
+                                            <option value="Natural Daylight">Natural Daylight</option>
+                                            <option value="Golden Hour">Golden Hour</option>
+                                            <option value="Dramatic">Dramatic</option>
+                                            <option value="Neon">Neon</option>
+                                            <option value="Studio">Studio Softbox</option>
+                                            <option value="Rim Light">Rim Light</option>
+                                            <option value="Volumetric">Volumetric (God Rays)</option>
+                                            <option value="Flash">Hard Flash</option>
+                                        </>
+                                    }
+                                />
+                                <FormSelect
+                                    label="Angle"
+                                    name="angle" 
+                                    value={formData.angle} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Angle...</option>
+                                            <option value="Low Angle">Low Angle</option>
+                                            <option value="High Angle">High Angle</option>
+                                            <option value="Eye Level">Eye Level</option>
+                                            <option value="Close-up">Extreme Close-up</option>
+                                            <option value="Wide Shot">Wide Shot</option>
+                                            <option value="Fisheye">Fisheye</option>
+                                            <option value="Drone">Drone Shot</option>
+                                            <option value="Dutch Angle">Dutch Angle</option>
+                                            <option value="Over Shoulder">Over Shoulder</option>
+                                            <option value="Worms Eye">Worm's Eye</option>
+                                        </>
+                                    }
+                                />
+                             </div>
+                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <FormSelect
+                                    label="Mood"
+                                    name="mood" 
+                                    value={formData.mood} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Pilih Mood...</option>
+                                            <option value="Intense">Tegang / Serius</option>
+                                            <option value="Victory">Perayaan / Menang</option>
+                                            <option value="Focus">Fokus Penuh</option>
+                                            <option value="Gritty">Keras / Tangguh</option>
+                                            <option value="Ethereal">Estetik / Lembut</option>
+                                            <option value="Dark">Gelap / Dramatis</option>
+                                            <option value="Energetic">Enerjik / Ceria</option>
+                                            <option value="Nostalgic">Jadul / Kenangan</option>
+                                        </>
+                                    }
+                                />
+                                <FormSelect
+                                    label="Background"
+                                    name="background" 
+                                    value={formData.background} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Background...</option>
+                                            <option value="Stadium">Packed Stadium</option>
+                                            <option value="Empty Stadium">Empty Stadium</option>
+                                            <option value="Indoor Court">Indoor Arena</option>
+                                            <option value="Outdoor Field">Outdoor Field</option>
+                                            <option value="Urban Street">Urban Street</option>
+                                            <option value="Nature">Nature/Mountains</option>
+                                            <option value="Studio Black">Studio Black</option>
+                                            <option value="Studio White">Studio White</option>
+                                            <option value="Abstract">Abstract Blur</option>
+                                            <option value="Gym">Gym/Training Center</option>
+                                        </>
+                                    }
+                                />
+                                <FormSelect
+                                    label="Quality"
+                                    name="quality" 
+                                    value={formData.quality} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Quality...</option>
+                                            <option value="8K Ultra HD">8K UHD</option>
+                                            <option value="4K High Quality">4K HQ</option>
+                                            <option value="Raw">RAW Photo</option>
+                                            <option value="Masterpiece">Masterpiece</option>
+                                        </>
+                                    }
+                                />
+                                <FormSelect
+                                    label="Count"
+                                    name="athleteCount" 
+                                    value={formData.athleteCount} 
+                                    onChange={handleInputChange}
+                                    options={
+                                        <>
+                                            <option value="">Count...</option>
+                                            <option value="Solo Athlete">Solo</option>
+                                            <option value="Duo Athletes">Duo (1v1)</option>
+                                            <option value="Small Group">Small Group</option>
+                                            <option value="Full Team">Full Team</option>
+                                            <option value="Crowd">Crowd</option>
+                                        </>
+                                    }
+                                />
+                             </div>
+                        </div>
+
+                        <button 
+                        onClick={handleGenerate}
+                        className="mt-8 w-full py-5 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white text-lg font-black tracking-wide uppercase rounded-2xl shadow-xl hover:shadow-orange-900/50 transition-all flex items-center justify-center gap-3 group"
+                        >
+                        <Wand2 size={24} className="group-hover:rotate-12 transition-transform" /> Generate Prompt
+                        </button>
+                      </div>
+                </div>
+
+                {/* Result */}
+                <div className="lg:col-span-5">
+                    {generatedResult ? (
+                        <div className="bg-gray-900 rounded-[2rem] border border-orange-500/30 p-6 md:p-8 sticky top-8 shadow-2xl animate-in slide-in-from-bottom-4">
+                             <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">Result Ready</span>
                                 </div>
+                                <div className="flex gap-2">
+                                    <button onClick={() => copyToClipboard(generatedResult.singleLine)} className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-colors" title="Copy"><Copy size={18}/></button>
+                                </div>
+                             </div>
+
+                             <div className="bg-black/50 p-5 rounded-2xl border border-gray-800 mb-6 relative group">
+                                <code className="text-sm text-emerald-400 font-mono leading-relaxed break-words block">
+                                    {generatedResult.singleLine}
+                                </code>
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none rounded-2xl"></div>
+                             </div>
+
+                             <button 
+                             onClick={handleSave} 
+                             disabled={isSaving}
+                             className="w-full py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all group"
+                             >
+                                {isSaving ? <RefreshCw className="animate-spin" size={20}/> : <Plus size={20} className="group-hover:scale-110 transition-transform" />}
+                                Add to Content Plan (Shared)
+                             </button>
+                             <p className="text-center text-[10px] text-gray-500 mt-3 font-medium">Menyimpan ke status "Idea" di Database Publik</p>
+                        </div>
+                    ) : (
+                        <div className="h-[400px] flex flex-col items-center justify-center text-gray-600 p-8 border-2 border-dashed border-gray-800 rounded-[2rem] sticky top-8">
+                            <div className="p-6 bg-gray-900 rounded-full mb-4">
+                                <Dumbbell size={40} className="text-gray-700" />
                             </div>
-                        )}
+                            <p className="text-sm font-medium">Prompt akan muncul di sini</p>
+                            <p className="text-xs text-gray-700 mt-1">Siap untuk dieksekusi</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 3. Content Plan View (Kanban/List) - Updated with Manual Input
+const ContentPlanView = ({ prompts, onUpdateStatus, onDelete, onAddManual }) => {
+    const [filterStatus, setFilterStatus] = useState('All');
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newIdea, setNewIdea] = useState({ subject: '', description: '', platform: 'Instagram/Facebook' });
+
+    const statusColors = {
+        'Idea': 'bg-gray-800 text-gray-300 border-gray-700',
+        'Scheduled': 'bg-blue-900/30 text-blue-300 border-blue-800',
+        'Published': 'bg-emerald-900/30 text-emerald-300 border-emerald-800'
+    };
+
+    const handleAddSubmit = (e) => {
+        e.preventDefault();
+        if(!newIdea.subject) return;
+        onAddManual(newIdea);
+        setShowAddModal(false);
+        setNewIdea({ subject: '', description: '', platform: 'Instagram/Facebook' });
+    };
+
+    const filtered = filterStatus === 'All' ? prompts : prompts.filter(p => (p.status || 'Idea') === filterStatus);
+
+    return (
+        <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+            
+            {/* Header / Filter Section */}
+            <div className="flex flex-col md:flex-row items-center justify-center relative mb-8 gap-4">
+                
+                {/* Filters (Centered) */}
+                <div className="flex gap-1 bg-gray-900/80 p-1.5 rounded-2xl border border-gray-800 backdrop-blur-sm z-10">
+                    {['All', 'Idea', 'Scheduled', 'Published'].map(s => (
+                        <button 
+                            key={s}
+                            onClick={() => setFilterStatus(s)}
+                            className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${filterStatus === s ? 'bg-orange-600 text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                        >
+                            {s}
+                        </button>
+                    ))}
+                </div>
+                
+                {/* New Idea Button (Right aligned on desktop, full width on mobile) */}
+                <div className="w-full md:w-auto md:absolute md:right-0 z-0">
+                    <button 
+                        onClick={() => setShowAddModal(true)}
+                        className="w-full md:w-auto px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-orange-500/20 transition-all text-xs uppercase tracking-wide"
+                    >
+                        <Plus size={16} /> New Idea
+                    </button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map(p => (
+                    <div key={p.id} className="bg-gray-900/80 border border-gray-800 rounded-2xl p-5 hover:border-orange-500/30 transition-all group hover:shadow-xl hover:shadow-black/50 backdrop-blur-sm relative overflow-hidden">
+                        {p.aiModel === 'Manual' && <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-blue-500/20 to-transparent pointer-events-none rounded-bl-3xl"></div>}
                         
-                        {/* TAB: CALENDAR */}
-                        {activeTab === 'calendar' && (
-                            <div className="text-center py-20 bg-gray-900 rounded-3xl border border-gray-800">
-                                <CalendarIcon size={48} className="mx-auto text-gray-700 mb-4"/>
-                                <h3 className="text-xl font-bold text-gray-300">Calendar View</h3>
-                                <p className="text-gray-500 text-sm mt-2">Fitur kalender akan membaca data tanggal dari Content Plan.</p>
+                        <div className="flex justify-between items-start mb-4 relative z-10">
+                            <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border ${statusColors[p.status || 'Idea']}`}>
+                                {p.status || 'Idea'}
+                            </span>
+                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => onDelete(p.id)} className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 size={16}/></button>
+                             </div>
+                        </div>
+                        
+                        <h3 className="text-white font-bold mb-2 line-clamp-1 text-lg flex items-center gap-2">
+                            {p.aiModel === 'Manual' && <PenTool size={14} className="text-blue-400" />}
+                            {p.subject || "Untitled Content"}
+                        </h3>
+                        <div className="bg-black/30 p-3 rounded-xl border border-white/5 mb-4 h-20 overflow-hidden">
+                            <p className="text-xs text-gray-400 font-mono line-clamp-3">{p.fullPrompt}</p>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 mb-5 text-xs text-gray-400 font-medium">
+                            <div className="p-1 bg-gray-800 rounded">
+                                <Layout size={12} /> 
                             </div>
-                        )}
+                            {p.platform}
+                        </div>
+
+                        {/* Controls */}
+                        <div className="pt-4 border-t border-gray-800 flex flex-col gap-3">
+                            <div className="flex items-center gap-3">
+                                <div className="text-gray-500"><Clock size={16} /></div>
+                                <input 
+                                    type="date" 
+                                    value={p.scheduledDate || ''} 
+                                    onChange={(e) => onUpdateStatus(p.id, { scheduledDate: e.target.value })}
+                                    className="bg-gray-950/50 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 focus:border-orange-500 outline-none w-full font-medium"
+                                />
+                            </div>
+                            <select 
+                                value={p.status || 'Idea'} 
+                                onChange={(e) => onUpdateStatus(p.id, { status: e.target.value })}
+                                className="bg-gray-950/50 border border-gray-700 rounded-lg px-3 py-2.5 text-xs text-gray-300 focus:border-orange-500 outline-none w-full font-bold uppercase cursor-pointer"
+                            >
+                                <option value="Idea">Idea</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Published">Published</option>
+                            </select>
+                        </div>
+                    </div>
+                ))}
+            </div>
+             {filtered.length === 0 && (
+                <div className="text-center py-32 bg-gray-900/30 border-2 border-dashed border-gray-800 rounded-[2rem]">
+                    <div className="inline-block p-4 bg-gray-800 rounded-full mb-4 opacity-50">
+                        <ListIcon size={32} className="text-gray-500" />
+                    </div>
+                    <p className="text-gray-500 font-medium">Tidak ada konten publik di status ini.</p>
+                    <button onClick={() => setShowAddModal(true)} className="text-orange-500 text-sm font-bold mt-2 hover:underline">Tambah Ide Bersama</button>
+                </div>
+            )}
+
+            {/* Add Modal */}
+            {showAddModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 w-full max-w-lg shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+                        <button onClick={() => setShowAddModal(false)} className="absolute top-4 right-4 p-2 text-gray-500 hover:text-white rounded-full hover:bg-gray-800 transition-colors z-10 bg-gray-900/50 backdrop-blur-sm"><X size={20} /></button>
+                        
+                        <div className="mb-6 flex items-center gap-3">
+                            <div className="p-3 bg-blue-500/20 rounded-xl text-blue-400">
+                                <PenTool size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-black text-white">Manual Input (Publik)</h3>
+                                <p className="text-sm text-gray-400">Ide ini akan terlihat oleh semua anggota tim</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleAddSubmit} className="space-y-5">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Judul / Topik Utama</label>
+                                <input 
+                                    autoFocus
+                                    type="text" 
+                                    value={newIdea.subject}
+                                    onChange={e => setNewIdea({...newIdea, subject: e.target.value})}
+                                    className="w-full bg-gray-950 border-2 border-gray-800 rounded-xl px-4 py-3.5 text-white focus:border-blue-500 outline-none transition-all placeholder-gray-600 font-medium"
+                                    placeholder="Contoh: Promo Diskon Akhir Tahun..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Deskripsi & Notes</label>
+                                <textarea 
+                                    value={newIdea.description}
+                                    onChange={e => setNewIdea({...newIdea, description: e.target.value})}
+                                    className="w-full bg-gray-950 border-2 border-gray-800 rounded-xl px-4 py-3.5 text-white focus:border-blue-500 outline-none resize-none placeholder-gray-600 min-h-[100px]"
+                                    rows={4}
+                                    placeholder="Tulis detail brief konten, caption, atau catatan penting di sini..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Target Platform</label>
+                                <div className="relative">
+                                    <select 
+                                        value={newIdea.platform}
+                                        onChange={e => setNewIdea({...newIdea, platform: e.target.value})}
+                                        className="w-full bg-gray-950 border-2 border-gray-800 rounded-xl px-4 py-3.5 text-white focus:border-blue-500 outline-none appearance-none"
+                                    >
+                                        <option>Instagram/Facebook</option>
+                                        <option>Instagram Portrait (4:5)</option>
+                                        <option>TikTok/Reels (9:16)</option>
+                                        <option>YouTube (16:9)</option>
+                                        <option>Twitter/X</option>
+                                        <option>Website/Blog</option>
+                                        <option>LinkedIn</option>
+                                    </select>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <ChevronRight size={16} className="rotate-90" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-3.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-bold transition-colors">Batal</button>
+                                <button type="submit" className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-colors shadow-lg shadow-blue-900/30">Simpan Ide</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            );
-        }
+            )}
+        </div>
+    );
+};
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+// 4. Calendar View
+const CalendarView = ({ prompts }) => {
+    const today = new Date();
+    const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+    const [selectedEvent, setSelectedEvent] = useState(null);
+
+    const getDaysInMonth = (date) => {
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    };
+
+    const getFirstDayOfMonth = (date) => {
+        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    };
+
+    const daysInMonth = getDaysInMonth(currentMonth);
+    const firstDay = getFirstDayOfMonth(currentMonth);
+    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    const blanks = Array.from({ length: firstDay }, (_, i) => i);
+
+    const nextMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    const prevMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+
+    const getEventsForDay = (day) => {
+        const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        return prompts.filter(p => p.scheduledDate === dateStr);
+    };
+
+    return (
+        <div className="max-w-7xl mx-auto h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-end mb-6">
+                <div className="flex items-center gap-6 bg-gray-900/80 p-2.5 rounded-2xl border border-gray-800 backdrop-blur-sm">
+                    <button onClick={prevMonth} className="p-2 hover:bg-gray-800 rounded-xl text-gray-400 hover:text-white transition-colors"><ChevronLeft size={24}/></button>
+                    <span className="font-bold text-white text-xl w-48 text-center tracking-tight">
+                        {currentMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+                    </span>
+                    <button onClick={nextMonth} className="p-2 hover:bg-gray-800 rounded-xl text-gray-400 hover:text-white transition-colors"><ChevronRight size={24}/></button>
+                </div>
+            </div>
+
+            <div className="bg-gray-900/80 border border-gray-800 rounded-[2rem] p-6 flex-1 flex flex-col shadow-2xl backdrop-blur-sm">
+                <div className="grid grid-cols-7 mb-6">
+                    {['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'].map(d => (
+                        <div key={d} className="text-center text-xs font-bold text-gray-500 uppercase tracking-widest">{d}</div>
+                    ))}
+                </div>
+                <div className="grid grid-cols-7 gap-px bg-gray-800 border border-gray-800 flex-1 rounded-xl overflow-hidden">
+                    {blanks.map(b => <div key={`blank-${b}`} className="bg-gray-900/40 min-h-[140px]"></div>)}
+                    {days.map(day => {
+                        const events = getEventsForDay(day);
+                        const isToday = day === today.getDate() && currentMonth.getMonth() === today.getMonth() && currentMonth.getFullYear() === today.getFullYear();
+                        
+                        return (
+                            <div key={day} className={`bg-gray-900/60 min-h-[140px] p-3 hover:bg-gray-800/80 transition-colors group ${isToday ? 'bg-gray-800/90' : ''}`}>
+                                <div className="flex justify-between items-start mb-3">
+                                    <div className={`text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-orange-600 text-white shadow-lg' : 'text-gray-400 group-hover:text-white'}`}>{day}</div>
+                                    {events.length > 0 && <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>}
+                                </div>
+                                <div className="space-y-1.5 overflow-y-auto max-h-[100px] custom-scrollbar">
+                                    {events.map(ev => (
+                                        <div 
+                                            key={ev.id} 
+                                            onClick={() => setSelectedEvent(ev)}
+                                            className="text-[10px] px-2 py-1.5 rounded-lg bg-gray-800 border border-gray-700 hover:border-orange-500/50 text-gray-300 truncate cursor-pointer transition-colors shadow-sm flex items-center gap-1 hover:bg-gray-750" 
+                                            title="Klik untuk detail"
+                                        >
+                                            <span className="opacity-70">{ev.aiModel === 'Manual' ? <PenTool size={8}/> : (ev.platform.includes('Instagram') ? '📸' : '🎬')}</span> 
+                                            {ev.subject || 'Untitled'}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Event Detail Modal */}
+            {selectedEvent && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-gray-900 border-2 border-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
+                        <button onClick={() => setSelectedEvent(null)} className="absolute top-4 right-4 p-2 text-gray-500 hover:text-white rounded-full hover:bg-gray-800 transition-colors bg-gray-950/50"><X size={20}/></button>
+                        
+                        <h3 className="text-xl font-bold text-white mb-2 pr-10 leading-tight">{selectedEvent.subject || 'Untitled'}</h3>
+                        
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            <span className="px-2 py-1 bg-gray-800 rounded text-[10px] font-bold text-gray-400 border border-gray-700 uppercase tracking-wide">
+                                {selectedEvent.platform}
+                            </span>
+                            <span className={`px-2 py-1 rounded text-[10px] font-bold border uppercase tracking-wide ${selectedEvent.status === 'Published' ? 'bg-emerald-900/30 text-emerald-400 border-emerald-800' : selectedEvent.status === 'Scheduled' ? 'bg-blue-900/30 text-blue-400 border-blue-800' : 'bg-gray-800 text-gray-400 border-gray-700'}`}>
+                                {selectedEvent.status || 'Idea'}
+                            </span>
+                        </div>
+
+                        <div className="bg-black/30 p-4 rounded-xl border border-white/5 mb-6 max-h-60 overflow-y-auto custom-scrollbar">
+                            <p className="text-xs text-gray-400 font-mono whitespace-pre-wrap leading-relaxed">{selectedEvent.fullPrompt}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 text-xs bg-gray-800/50 p-4 rounded-xl border border-gray-800">
+                            <div>
+                                <span className="block font-bold text-gray-500 uppercase tracking-wider mb-1">Tanggal Jadwal</span>
+                                <span className="text-white font-medium">
+                                    {selectedEvent.scheduledDate ? new Date(selectedEvent.scheduledDate).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '-'}
+                                </span>
+                            </div>
+                            <div>
+                                <span className="block font-bold text-gray-500 uppercase tracking-wider mb-1">Sumber/Model</span>
+                                <span className="text-white font-medium">{selectedEvent.aiModel}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// --- Main App Component ---
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('generator'); // generator, plan, calendar
+  const [prompts, setPrompts] = useState([]);
+  const [deleteTargetId, setDeleteTargetId] = useState(null); // Added for delete modal
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    aiModel: '',
+    type: '',
+    platform: '',
+    sportsCategory: '',
+    actionType: '',
+    athleteCount: '',
+    athletePose: '',
+    contentStyle: '',
+    materialTexture: '',
+    subject: '',
+    background: '',
+    angle: '',
+    lighting: '',
+    mood: '',
+    visualStyle: '',
+    composition: '',
+    quality: '',
+    aspectRatio: 'Auto',
+    seed: ''
+  });
+
+  const [generatedResult, setGeneratedResult] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // --- Auth & Data ---
+  useEffect(() => {
+    const initAuth = async () => {
+      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+        await signInWithCustomToken(auth, __initial_auth_token);
+      } else {
+        await signInAnonymously(auth);
+      }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, setUser);
+    return () => unsubscribe();
+  }, []);
+
+  // UPDATED: Now fetches from public/data so everyone sees the same content
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'));
+    return onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setPrompts(data);
+    }, (error) => {
+        console.error("Firestore error:", error);
+    });
+  }, [user]);
+
+  // --- Actions ---
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const copyToClipboard = async (text) => {
+    await navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard!');
+  };
+
+  const handleGenerate = () => {
+    const {
+      aiModel, type, platform, sportsCategory, actionType, athleteCount,
+      athletePose, contentStyle, materialTexture, subject, background,
+      angle, lighting, mood, visualStyle, composition, quality,
+      aspectRatio, seed
+    } = formData;
+
+    if (!aiModel || !platform || !sportsCategory) {
+      showToast('Mohon lengkapi AI Model, Platform, dan Kategori.', 'error');
+      return;
+    }
+
+    let mainPrompt = [];
+    let technical = [];
+    let negative = [];
+    let finalAspectRatio = '1:1';
+
+    // 1. Subject & Pose
+    mainPrompt.push(subject);
+    mainPrompt.push(athletePose.toLowerCase());
+
+    // --- ENHANCED POSE & SPORT LOGIC (RESTORED & EXPANDED) ---
+    const p = athletePose;
+    const sc = sportsCategory;
+    
+    // Team Sports
+    if (p.includes('Kicking') || p.includes('Penalty') || p.includes('Free Kick')) {
+       technical.push('leg extended kicking motion', 'impact moment', 'football visible');
+    } else if (p.includes('Dribbling') && sc.includes('Football')) {
+       technical.push('ball at feet', 'running motion', 'low center of gravity');
+    } else if (p.includes('Goalkeeper')) {
+       technical.push('diving stretch position', 'gloves extended', 'mid-air save');
+    } else if (p.includes('Tackle') && sc.includes('Football')) {
+       technical.push('sliding tackle', 'grass flying', 'intense contact');
+    } else if (p.includes('Dunking') || p.includes('Alley-oop')) {
+       technical.push('jumping high above rim', 'slam dunk', 'explosive vertical', 'basketball hoop');
+    } else if (p.includes('Crossover')) {
+       technical.push('ankle breaker move', 'low dribble', 'shifting weight');
+    } else if (p.includes('Spiking') || p.includes('Block')) {
+       technical.push('vertical jump', 'arms extended above net', 'volleyball impact');
+    } else if (p.includes('Batting') || p.includes('Pitching')) {
+       technical.push('baseball bat swing', 'follow through', 'pitcher winding up', 'dust kicking up');
+    } else if (p.includes('Tackle') && sc.includes('Rugby')) {
+       technical.push('body tackle', 'scrum formation', 'mud and dirt details');
+    }
+
+    // Racquet Sports
+    else if (p.includes('Serve') || p.includes('Ace')) {
+       technical.push('toss ball high', 'racket extended', 'impact point');
+    } else if (p.includes('Backhand') || p.includes('Forehand')) {
+       technical.push('racket swing follow through', 'tennis ball compression', 'intense focus');
+    } else if (p.includes('Bandeja') || p.includes('Vibora')) {
+       technical.push('padel overhead shot', 'tactical tray shot', 'glass wall reflection');
+    } else if (p.includes('Smash') && sc.includes('Badminton')) {
+       technical.push('jumping smash', 'shuttlecock blur', 'racket flex');
+    }
+
+    // Combat Sports
+    else if (p.includes('Punch') || p.includes('Jab') || p.includes('Hook')) {
+       technical.push('boxing glove impact', 'sweat spray from impact', 'facial distortion');
+    } else if (p.includes('Kick') && (sc.includes('MMA') || sc.includes('Muay Thai'))) {
+       technical.push('high kick', 'shin impact', 'dynamic flexibility');
+    } else if (p.includes('Grappling') || p.includes('Submission')) {
+       technical.push('ground fighting', 'jiu-jitsu submission hold', 'intense strain');
+    } else if (p.includes('Face-off')) {
+       technical.push('intense staring contest', 'nose to nose', 'weigh-in atmosphere');
+    } else if (p.includes('Fencing')) {
+        technical.push('lunge position', 'foil bent', 'mask reflection');
+    }
+
+    // Motor Sports
+    else if (p.includes('Cornering')) {
+       technical.push('knee scraping asphalt', 'leaning motorbike', 'motion blur background');
+    } else if (p.includes('Drifting')) {
+       technical.push('tire smoke', 'counter steering', 'sideways car');
+    } else if (p.includes('Pit Stop')) {
+       technical.push('pit crew action', 'tire change', 'fast paced coordination');
+    } else if (p.includes('Wheelie')) {
+       technical.push('front wheel lift', 'balancing', 'engine power');
+    }
+
+    // Water Sports
+    else if (p.includes('Barrel') || p.includes('Tube')) {
+       technical.push('inside wave barrel', 'water curtain', 'ocean spray');
+    } else if (p.includes('Start') && sc.includes('Swimming')) {
+       technical.push('diving off block', 'streamlined body', 'water splash entry');
+    } else if (p.includes('Rowing')) {
+        technical.push('oars in water', 'synchronized movement', 'water droplets');
+    }
+
+    // Precision/Athletics
+    else if (p.includes('Golf Swing')) {
+        technical.push('club follow through', 'grass divot', 'body rotation');
+    } else if (p.includes('Archery')) {
+        technical.push('bow tension', 'focused eye', 'string vibration');
+    } else if (p.includes('High Jump')) {
+        technical.push('arched back', 'clearing bar', 'anti-gravity look');
+    }
+
+    // Extreme/Winter
+    else if (p.includes('Grind') || p.includes('Ollie') || p.includes('Flip')) {
+       technical.push('skateboard trick', 'mid-air board', 'urban obstacles');
+    } else if (p.includes('Powder') || p.includes('Carving')) {
+       technical.push('snow spray', 'deep powder snow', 'mountain slope');
+    }
+
+    // 2. Sport Category Environment Enhancements
+    mainPrompt.push(sc.toLowerCase() + ' sports');
+    if (sc.includes('Football')) technical.push('stadium floodlights', 'green grass pitch');
+    else if (sc.includes('Basketball')) technical.push('hardwood court reflection', 'indoor arena');
+    else if (sc.includes('Padel')) technical.push('padel court', 'glass walls', 'blue turf');
+    
+    // Fix: Tennis Logic (Randomized between Clay and Grass)
+    else if (sc.includes('Tennis')) technical.push(Math.random() > 0.5 ? 'clay court' : 'grass court');
+    
+    else if (sc.includes('F1') || sc.includes('MotoGP')) technical.push('race track asphalt', 'curbs', 'grandstand blur');
+    else if (sc.includes('Swimming')) technical.push('pool tiles', 'underwater refraction', 'bubbles');
+    else if (sc.includes('MMA') || sc.includes('Boxing')) technical.push('boxing ring ropes', 'octagon fence', 'spotlights');
+    else if (sc.includes('Gym')) technical.push('gym mirrors', 'dumbbells', 'chalk dust');
+    else if (sc.includes('Snowboarding') || sc.includes('Skiing')) technical.push('snowy mountain peak', 'blue sky', 'sun glare on snow');
+    else if (sc.includes('Golf')) technical.push('green manicured grass', 'sand bunker', 'fairway');
+    else if (sc.includes('Ice Hockey')) technical.push('scratched ice surface', 'plexiglass reflection', 'cold atmosphere');
+    
+    // 3. Action Type & Context
+    if (actionType.includes('Action Shot')) technical.push('captured in motion', 'freeze frame action', 'high shutter speed');
+    else if (actionType.includes('Celebration')) mainPrompt.push('emotional victory', 'tears of joy', 'hugging teammates');
+    else if (actionType.includes('Slow Motion')) technical.push('slow motion aesthetic', 'suspended particles', 'ethereal vibe');
+    else if (actionType.includes('Portrait')) technical.push('sweaty face close-up', 'detailed skin texture', 'intense eyes');
+    else if (actionType.includes('Press Conference')) mainPrompt.push('press conference microphone', 'media backdrop', 'flash photography');
+    else if (actionType.includes('Locker Room')) mainPrompt.push('locker room setting', 'focused preparation', 'sitting on bench');
+    else if (actionType.includes('Fan Interaction')) mainPrompt.push('signing autograph', 'high five with fans', 'stadium crowd foreground');
+    else if (actionType.includes('Macro')) technical.push('macro shot of gear', 'texture detail', 'shoe laces', 'ball stitching');
+    else if (actionType.includes('Product')) technical.push('commercial product shot', 'clean background', 'studio lighting', 'floating object');
+    else if (actionType.includes('Drone')) technical.push('aerial view', 'top-down shot', 'epic scale');
+
+    // 4. Content Style & Branding
+    if (contentStyle.includes('Photography')) technical.push('award winning sports photography', 'National Geographic style');
+    else if (contentStyle.includes('Cinematic')) technical.push('cinematic lighting', 'anamorphic lens flares', 'movie poster aesthetic');
+    else if (contentStyle.includes('Nike')) mainPrompt.push('Nike commercial style', 'Just Do It vibe', 'dramatic contrast', 'heroic lighting');
+    else if (contentStyle.includes('Adidas')) mainPrompt.push('Adidas Impossible is Nothing', 'urban gritty style', 'street sports');
+    else if (contentStyle.includes('Red Bull')) mainPrompt.push('Red Bull extreme photography', 'fisheye lens', 'vibrant energy', 'action cam angle');
+    else if (contentStyle.includes('Under Armour')) mainPrompt.push('Under Armour Protect This House', 'gritty determination', 'gym atmosphere', 'desaturated tones');
+    else if (contentStyle.includes('Luxury')) mainPrompt.push('luxury fashion campaign', 'Louis Vuitton sport', 'elegant lighting', 'high fashion pose');
+    else if (contentStyle.includes('Retro 90s')) mainPrompt.push('90s vintage aesthetic', 'film grain', 'VHS glitch', 'flash photography');
+    else if (contentStyle.includes('Cyberpunk')) mainPrompt.push('cyberpunk 2077 style', 'neon rain', 'futuristic gear', 'night city background');
+    else if (contentStyle.includes('Minimalist')) mainPrompt.push('minimalist composition', 'negative space', 'clean lines', 'pastel colors');
+    else if (contentStyle.includes('Noir')) mainPrompt.push('film noir style', 'high contrast black and white', 'shadows', 'mystery');
+
+    // 5. Visual/Render Style
+    if (visualStyle.includes('Photorealistic')) technical.push('photorealistic', '8k', 'unreal engine 5', 'ray tracing');
+    else if (visualStyle.includes('3D Render')) mainPrompt.push('3D character render', 'Pixar Disney style', 'subsurface scattering', 'cute');
+    else if (visualStyle.includes('Anime')) mainPrompt.push('shonen anime style', 'manga action lines', 'cel shaded', 'dramatic aura');
+    else if (visualStyle.includes('Sketch')) mainPrompt.push('charcoal sketch', 'pencil drawing', 'rough lines', 'artistic');
+    else if (visualStyle.includes('Glitch')) mainPrompt.push('glitch art', 'datamosh', 'digital distortion', 'RGB split');
+    else if (visualStyle.includes('Double Exposure')) mainPrompt.push('double exposure', 'silhouette of athlete filled with landscape');
+    else if (visualStyle.includes('Low Poly')) mainPrompt.push('low poly 3d', 'geometric shapes', 'minimalist');
+    else if (visualStyle.includes('Voxel')) mainPrompt.push('voxel art', 'minecraft style', 'blocky');
+    else if (visualStyle.includes('Oil Painting')) mainPrompt.push('oil painting', 'thick brush strokes', 'impressionist');
+    else if (visualStyle.includes('Pixel')) mainPrompt.push('pixel art', '8-bit', 'retro game style');
+
+    // 6. Tech Specs
+    technical.push(`${lighting.toLowerCase()}`);
+    technical.push(`${angle.toLowerCase()}`);
+    mainPrompt.push(`${mood.toLowerCase()} atmosphere`);
+    technical.push(`${composition.toLowerCase()}`);
+
+    if (aspectRatio !== 'Auto') {
+      finalAspectRatio = aspectRatio;
+    } else {
+      if (platform.includes('Instagram') || platform.includes('Facebook')) finalAspectRatio = '1:1';
+      else if (platform.includes('TikTok') || platform.includes('Reels')) finalAspectRatio = '9:16';
+      else finalAspectRatio = '16:9';
+    }
+
+    negative.push('blurry', 'low quality', 'amateur', 'bad anatomy', 'watermark', 'text', 'deformed');
+    if (background.includes('White')) negative.push('shadows', 'noise');
+
+    let singleLine = '';
+    let badgeColor = '#6b7280';
+
+    if (aiModel === 'Midjourney') {
+      singleLine = `/imagine prompt: ${mainPrompt.join(', ')}, ${technical.join(', ')} --ar ${finalAspectRatio} --v 6.0 --q 2 --style raw ${seed ? `--seed ${seed}` : ''} --no ${negative.join(', ')}`;
+      badgeColor = '#5865F2';
+    } else if (aiModel === 'Stable Diffusion') {
+       singleLine = `${mainPrompt.join(', ')}, ${technical.join(', ')} \nNegative prompt: ${negative.join(', ')} \nSteps: 30, Sampler: DPM++ 2M Karras, CFG: 7, Size: ${finalAspectRatio}, Seed: ${seed || 'Random'}`;
+       badgeColor = '#8B5CF6';
+    } else if (aiModel === 'DALL-E' || aiModel === 'Gemini') {
+       singleLine = `Create an image of ${mainPrompt.join(', ')}. Details: ${technical.join(', ')}. Ensure ${contentStyle} style.`;
+       badgeColor = aiModel === 'DALL-E' ? '#10A37F' : '#4285F4';
+    } else {
+       singleLine = `${mainPrompt.join(', ')}, ${technical.join(', ')} \nNegative: ${negative.join(', ')}`;
+       badgeColor = '#F59E0B';
+    }
+
+    setGeneratedResult({
+        singleLine,
+        mainPrompt,
+        aiModel,
+        rawDate: new Date().toISOString()
+    });
+    showToast('Prompt berhasil dibuat!');
+  };
+
+  // UPDATED: Saves to public/data
+  const handleSave = async () => {
+    if (!user || !generatedResult) return;
+    setIsSaving(true);
+    try {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'), {
+            ...formData,
+            fullPrompt: generatedResult.singleLine,
+            status: 'Idea', // Default status for Content Plan
+            scheduledDate: '', // Empty date
+            createdAt: new Date().toISOString()
+        });
+        showToast('Added to Content Plan (Shared)');
+    } catch (e) {
+        console.error(e);
+        showToast('Error saving', 'error');
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
+  // UPDATED: Saves to public/data
+  const handleAddManualPrompt = async (data) => {
+      if (!user) return;
+      try {
+          await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'), {
+              subject: data.subject,
+              fullPrompt: data.description, // using fullPrompt field for description
+              platform: data.platform,
+              status: 'Idea',
+              scheduledDate: '',
+              createdAt: new Date().toISOString(),
+              aiModel: 'Manual', // Indicator
+              sportsCategory: 'General'
+          });
+          showToast('Ide baru ditambahkan (Shared)');
+      } catch (e) {
+          console.error(e);
+          showToast('Gagal menambah ide', 'error');
+      }
+  };
+
+  // UPDATED: Updates in public/data
+  const handleUpdateStatus = async (id, data) => {
+      try {
+          await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'prompts', id), data);
+          showToast('Updated successfully');
+      } catch(e) {
+          showToast('Update failed', 'error');
+      }
+  };
+
+  // Modified handleDelete to trigger modal
+  const handleDelete = (id) => {
+      setDeleteTargetId(id);
+  };
+
+  // UPDATED: Deletes from public/data
+  const confirmDelete = async () => {
+      if (!user || !deleteTargetId) return;
+      try {
+          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'prompts', deleteTargetId));
+          showToast('Konten berhasil dihapus');
+      } catch (error) {
+          console.error("Delete error:", error);
+          showToast('Gagal menghapus', 'error');
+      } finally {
+          setDeleteTargetId(null);
+      }
+  };
+
+  const pageTitles = {
+      'generator': 'AI Content Generator',
+      'plan': 'Strategic Content Plan',
+      'calendar': 'Publication Calendar'
+  };
+
+  return (
+    <div className="w-full min-h-screen font-sans bg-black text-gray-200">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        
+        {/* GLOBAL HEADER AREA */}
+        <div className="flex flex-col items-center mb-6 animate-in fade-in slide-in-from-top-4 duration-700">
+            {/* Logo & Brand */}
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl shadow-lg shadow-orange-900/40">
+                    <Dumbbell className="text-white" size={32} />
+                </div>
+                <div className="flex flex-col">
+                    <span className="font-black text-2xl text-white tracking-tighter leading-none">HUDAN <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">CONTENT</span></span>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">PLAN</span>
+                </div>
+            </div>
+
+            {/* Dynamic Page Title */}
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-6 text-center tracking-tight drop-shadow-xl">
+                {pageTitles[activeTab]}
+            </h1>
+            
+            <div className="flex items-center gap-2 mb-6 px-4 py-2 bg-blue-900/30 border border-blue-800 rounded-full text-blue-300 text-xs font-bold animate-pulse">
+                <Users size={14} />
+                <span>Mode Kolaborasi Aktif (Shared Data)</span>
+            </div>
+
+            {/* CENTRAL NAVIGATION TABS */}
+            <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
+
+        {/* MAIN CONTENT AREA */}
+        <div className="w-full pb-12">
+            {activeTab === 'generator' && (
+                <GeneratorView 
+                    formData={formData} 
+                    handleInputChange={handleInputChange} 
+                    handleGenerate={handleGenerate}
+                    generatedResult={generatedResult}
+                    isSaving={isSaving}
+                    handleSave={handleSave}
+                    copyToClipboard={copyToClipboard}
+                />
+            )}
+            {activeTab === 'plan' && (
+                <ContentPlanView 
+                    prompts={prompts} 
+                    onUpdateStatus={handleUpdateStatus} 
+                    onDelete={handleDelete}
+                    onAddManual={handleAddManualPrompt}
+                />
+            )}
+            {activeTab === 'calendar' && (
+                <CalendarView prompts={prompts} />
+            )}
+        </div>
+
+      </div>
+
+      {/* DELETE CONFIRMATION MODAL (CUSTOM) */}
+      {deleteTargetId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-gray-900 border-2 border-red-900/50 rounded-2xl p-6 w-full max-w-sm shadow-2xl shadow-red-900/20 transform scale-100 animate-in zoom-in-95 duration-200">
+                <div className="flex flex-col items-center text-center">
+                    <div className="p-3 bg-red-900/20 rounded-full mb-4 text-red-500">
+                        <AlertCircle size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Hapus Konten?</h3>
+                    <p className="text-gray-400 text-sm mb-6">
+                        Tindakan ini tidak dapat dibatalkan. Ide konten ini akan hilang selamanya dari strategi Baginda.
+                    </p>
+                    <div className="flex gap-3 w-full">
+                        <button 
+                            onClick={() => setDeleteTargetId(null)}
+                            className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-bold transition-colors"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            onClick={confirmDelete}
+                            className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors shadow-lg shadow-red-900/30"
+                        >
+                            Ya, Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-5 right-5 z-50 px-6 py-4 rounded-xl shadow-2xl text-white transform transition-all duration-300 animate-in slide-in-from-right fade-in ${toast.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'}`}>
+          <div className="flex items-center gap-3">
+            {toast.type === 'error' ? <X size={20} /> : <CheckCircle size={20} />}
+            <span className="font-semibold">{toast.message}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
