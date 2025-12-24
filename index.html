@@ -1,304 +1,289 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2022.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hudan Content Plan</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #111827; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ea580c; }
+        body { background-color: #000; color: #fff; }
+    </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="id"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Hudan Content Plan&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar { width: 6px; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar-track { background: #111827; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ea580c; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body { background-color: #000; color: #fff; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script type="text/babel" data-type="module"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- IMPORTS DARI INTERNET (CDN) ---</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Firebase Imports</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import {<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import {<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Icon Imports</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>import {<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Copy, Trash2, Save, Wand2, Search, Filter, X, RefreshCw,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Dumbbell, Video, Image as ImageIcon, Share2, Zap, Layout,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Palette, Camera, Calendar as CalendarIcon, List as ListIcon,<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Plus, Clock, CheckCircle, MoreVertical, ChevronLeft,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>ChevronRight, PenTool, AlertCircle, Users</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>} from 'https://esm.sh/lucide-react';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- KONFIGURASI BAGINDA ---</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const firebaseConfig = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>apiKey: "AIzaSyDLoRJjfs9P9a5cvl90VtYHK7ZftW86rYI",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>authDomain: "hudan-content-plan.firebaseapp.com",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>projectId: "hudan-content-plan",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>storageBucket: "hudan-content-plan.firebasestorage.app",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>messagingSenderId: "712334443122",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>appId: "1:712334443122:web:6a43f452504322bd1ef8eb",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>measurementId: "G-DXQJ56VQW2"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const app = initializeApp(firebaseConfig);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const auth = getAuth(app);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const db = getFirestore(app);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const appId = "hudan-content-plan";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- KOMPONEN UI ---</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const FormSelect = ({ label, name, value, options, onChange }) =&gt; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="relative group mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1"&gt;{label}&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div className="relative"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;select<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>name={name}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>value={value}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>onChange={onChange}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>className="w-full pl-4 pr-8 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-orange-500/50 rounded-xl text-sm focus:ring-2 focus:ring-orange-900 focus:border-orange-500 outline-none transition-all appearance-none text-gray-200 font-medium"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>{options}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-orange-500 transition-colors"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;ChevronRight size={12} className="rotate-90" /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const SectionHeader = ({ title, icon }) =&gt; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-700/50"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div className="p-1.5 bg-gray-800 rounded-lg text-orange-500 shadow-sm border border-gray-700"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{icon}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;h3 className="text-sm font-bold text-gray-300 uppercase tracking-wide"&gt;{title}&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const NavItem = ({ icon, label, active, onClick }) =&gt; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>onClick={onClick}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ease-out ${</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>active<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>? 'bg-gray-800 text-white shadow-lg shadow-black/40 border border-gray-700 ring-1 ring-orange-500/50'<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>: 'text-gray-400 hover:text-white hover:bg-white/5'</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}`}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;span className={`${active ? 'text-orange-500' : ''}`}&gt;{icon}&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;span className="font-bold text-xs uppercase tracking-wide hidden md:block"&gt;{label}&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const NavigationTabs = ({ activeTab, setActiveTab }) =&gt; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;nav className="flex items-center gap-2 bg-gray-900/80 p-1.5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-xl inline-flex overflow-x-auto max-w-full scrollbar-hide justify-center"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;NavItem icon={&lt;Wand2 size={18} /&gt;} label="Generator" active={activeTab === 'generator'} onClick={() =&gt; setActiveTab('generator')} /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;NavItem icon={&lt;ListIcon size={18} /&gt;} label="Content Plan" active={activeTab === 'plan'} onClick={() =&gt; setActiveTab('plan')} /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;NavItem icon={&lt;CalendarIcon size={18} /&gt;} label="Calendar" active={activeTab === 'calendar'} onClick={() =&gt; setActiveTab('calendar')} /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/nav&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- MAIN APP ---</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function App() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [user, setUser] = useState(null);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [activeTab, setActiveTab] = useState('generator');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [prompts, setPrompts] = useState([]);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [generatedResult, setGeneratedResult] = useState(null);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [isSaving, setIsSaving] = useState(false);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// State Form Minimal (Untuk Demo Awal)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [formData, setFormData] = useState({</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>aiModel: 'Midjourney',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>platform: 'Instagram/Facebook',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>sportsCategory: 'Futsal',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>subject: '',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>athletePose: '',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>mood: 'Intense',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>visualStyle: 'Photorealistic',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>contentStyle: 'Nike Ad Style',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>lighting: 'Dramatic',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>angle: 'Low Angle'</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Auth</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>signInAnonymously(auth).then((cred) =&gt; setUser(cred.user));</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Realtime Listener</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const unsub = onSnapshot(q, (snapshot) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const data = snapshot.docs.map(d =&gt; ({ id: d.id, ...d.data() }));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>// Sort descending</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>data.sort((a, b) =&gt; new Date(b.createdAt) - new Date(a.createdAt));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>setPrompts(data);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return () =&gt; unsub();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}, []);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const handleInputChange = (e) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>setFormData({...formData, [e.target.name]: e.target.value});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const handleGenerate = () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const { subject, sportsCategory, mood, platform, aiModel, contentStyle } = formData;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Logika Prompt Sederhana</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const prompt = `/imagine prompt: ${subject}, ${sportsCategory} context, ${mood} atmosphere, ${contentStyle}, for ${platform} --v 6.0`;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>setGeneratedResult({</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>singleLine: prompt,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>aiModel: aiModel,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>createdAt: new Date().toISOString()</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const handleSave = async () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if(!generatedResult) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>setIsSaving(true);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>try {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'), {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>...formData,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>fullPrompt: generatedResult.singleLine,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>status: 'Idea',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>scheduledDate: '',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>createdAt: new Date().toISOString()</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>setIsSaving(false);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>setActiveTab('plan'); // Pindah tab otomatis</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} catch(e) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>console.error(e);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>setIsSaving(false);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div className="w-full min-h-screen font-sans bg-black text-gray-200 p-4 md:p-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div className="max-w-5xl mx-auto"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{/* Header */}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;div className="text-center mb-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                             </span>&lt;div className="flex items-center justify-center gap-3 mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;div className="p-3 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl shadow-lg"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;Dumbbell className="text-white" size={32} /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;div className="text-left"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;h1 className="text-2xl font-black tracking-tighter text-white"&gt;HUDAN &lt;span className="text-orange-500"&gt;CONTENT&lt;/span&gt;&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;p className="text-[10px] uppercase tracking-widest text-gray-500"&gt;Plan &amp; Generator&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{/* TAB: GENERATOR */}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{activeTab === 'generator' &amp;&amp; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;div className="bg-gray-900 p-6 rounded-3xl border border-gray-800"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;SectionHeader title="Konfigurasi" icon={&lt;Zap size={16}/&gt;} /&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;FormSelect label="Kategori" name="sportsCategory" value={formData.sportsCategory} onChange={handleInputChange}<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>options={&lt;&gt;&lt;option&gt;Futsal&lt;/option&gt;&lt;option&gt;Sepak Bola&lt;/option&gt;&lt;option&gt;Gym/Fitness&lt;/option&gt;&lt;/&gt;}<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>/&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;FormSelect label="Mood" name="mood" value={formData.mood} onChange={handleInputChange}<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>options={&lt;&gt;&lt;option&gt;Intense&lt;/option&gt;&lt;option&gt;Victory&lt;/option&gt;&lt;option&gt;Dark&lt;/option&gt;&lt;/&gt;}<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>/&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;div className="mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1"&gt;Subjek&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;textarea name="subject" onChange={handleInputChange} value={formData.subject} rows="3" className="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-sm focus:border-orange-500 outline-none" placeholder="Deskripsikan ide konten..."&gt;&lt;/textarea&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;button onClick={handleGenerate} className="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl font-bold text-white shadow-lg hover:shadow-orange-900/50 transition-all flex items-center justify-center gap-2"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;Wand2 size={20} /&gt; Generate Prompt</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;div className="space-y-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>{generatedResult ? (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;div className="bg-gray-800 p-6 rounded-3xl border border-gray-700"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;div className="text-green-400 text-xs font-bold mb-2 uppercase"&gt;Result Ready&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;code className="block bg-black/40 p-4 rounded-xl text-green-300 text-sm font-mono break-words mb-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                                </span>{generatedResult.singleLine}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;/code&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;button onClick={handleSave} disabled={isSaving} className="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-bold text-white flex justify-center items-center gap-2"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                                </span>{isSaving ? &lt;RefreshCw className="animate-spin"/&gt; : &lt;Plus/&gt;} Simpan ke Plan</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>) : (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;div className="h-full border-2 border-dashed border-gray-800 rounded-3xl flex flex-col items-center justify-center text-gray-600 p-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;Dumbbell size={40} className="mb-4 opacity-20"/&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;p className="text-sm"&gt;Prompt akan muncul di sini&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>)}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{/* TAB: CONTENT PLAN (DATABASE) */}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{activeTab === 'plan' &amp;&amp; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="animate-in fade-in slide-in-from-bottom-4 duration-500"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>{prompts.map(p =&gt; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;div key={p.id} className="bg-gray-900 border border-gray-800 p-5 rounded-2xl hover:border-orange-500/30 transition-all group"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;div className="flex justify-between items-start mb-2"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                                </span>&lt;span className="text-[10px] font-bold uppercase bg-gray-800 px-2 py-1 rounded text-gray-400 border border-gray-700"&gt;{p.status || 'Idea'}&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                                </span>&lt;button onClick={() =&gt; deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'prompts', p.id))} className="text-gray-600 hover:text-red-500"&gt;&lt;Trash2 size={14}/&gt;&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;h3 className="font-bold text-white mb-1 line-clamp-1"&gt;{p.subject || "Tanpa Judul"}&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;p className="text-xs text-gray-500 line-clamp-2 mb-3 font-mono bg-black/20 p-2 rounded"&gt;{p.fullPrompt}&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;div className="flex items-center gap-2 text-[10px] text-gray-400"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                                </span>&lt;Layout size={10}/&gt; {p.platform}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>))}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>{prompts.length === 0 &amp;&amp; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                        </span>&lt;div className="col-span-full text-center py-20 text-gray-600"&gt;Belum ada data di database.&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>)}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{/* TAB: CALENDAR */}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>{activeTab === 'calendar' &amp;&amp; (</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;div className="text-center py-20 bg-gray-900 rounded-3xl border border-gray-800"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;CalendarIcon size={48} className="mx-auto text-gray-700 mb-4"/&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;h3 className="text-xl font-bold text-gray-300"&gt;Calendar View&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>&lt;p className="text-gray-500 text-sm mt-2"&gt;Fitur kalender akan membaca data tanggal dari Content Plan.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- RENDER APLIKASI ---</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const root = ReactDOM.createRoot(document.getElementById('root'));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>root.render(&lt;App /&gt;);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        // --- IMPORTS ---
+        import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
+        import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client';
+        
+        // Firebase Imports
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { 
+            getAuth, signInAnonymously, onAuthStateChanged 
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { 
+            getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy 
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        
+        // Icon Imports
+        import { 
+            Trash2, Wand2, RefreshCw, Dumbbell, Calendar as CalendarIcon, 
+            List as ListIcon, Plus, Zap, Layout, ChevronRight
+        } from 'https://esm.sh/lucide-react';
+
+        // --- KONFIGURASI FIREBASE BAGINDA ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLoRJjfs9P9a5cvl90VtYHK7ZftW86rYI",
+            authDomain: "hudan-content-plan.firebaseapp.com",
+            projectId: "hudan-content-plan",
+            storageBucket: "hudan-content-plan.firebasestorage.app",
+            messagingSenderId: "712334443122",
+            appId: "1:712334443122:web:6a43f452504322bd1ef8eb",
+            measurementId: "G-DXQJ56VQW2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = "hudan-content-plan"; // ID Unik untuk koleksi database
+
+        // --- KOMPONEN UI ---
+
+        const FormSelect = ({ label, name, value, options, onChange }) => (
+            <div className="relative group mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1">{label}</label>
+                <div className="relative">
+                <select 
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    className="w-full pl-4 pr-8 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-orange-500/50 rounded-xl text-sm focus:ring-2 focus:ring-orange-900 focus:border-orange-500 outline-none transition-all appearance-none text-gray-200 font-medium"
+                >
+                    {options}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-orange-500 transition-colors">
+                    <ChevronRight size={12} className="rotate-90" />
+                </div>
+                </div>
+            </div>
+        );
+
+        const SectionHeader = ({ title, icon }) => (
+            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-700/50">
+                <div className="p-1.5 bg-gray-800 rounded-lg text-orange-500 shadow-sm border border-gray-700">
+                {icon}
+                </div>
+                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wide">{title}</h3>
+            </div>
+        );
+
+        const NavItem = ({ icon, label, active, onClick }) => (
+            <button 
+                onClick={onClick}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 ease-out ${
+                active 
+                    ? 'bg-gray-800 text-white shadow-lg shadow-black/40 border border-gray-700 ring-1 ring-orange-500/50' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+            >
+                <span className={`${active ? 'text-orange-500' : ''}`}>{icon}</span>
+                <span className="font-bold text-xs uppercase tracking-wide hidden md:block">{label}</span>
+            </button>
+        );
+
+        const NavigationTabs = ({ activeTab, setActiveTab }) => (
+            <nav className="flex items-center gap-2 bg-gray-900/80 p-1.5 rounded-2xl border border-white/10 backdrop-blur-sm shadow-xl inline-flex overflow-x-auto max-w-full scrollbar-hide justify-center">
+                <NavItem icon={<Wand2 size={18} />} label="Generator" active={activeTab === 'generator'} onClick={() => setActiveTab('generator')} />
+                <NavItem icon={<ListIcon size={18} />} label="Content Plan" active={activeTab === 'plan'} onClick={() => setActiveTab('plan')} />
+                <NavItem icon={<CalendarIcon size={18} />} label="Calendar" active={activeTab === 'calendar'} onClick={() => setActiveTab('calendar')} />
+            </nav>
+        );
+
+        // --- MAIN APP ---
+        function App() {
+            const [user, setUser] = useState(null);
+            const [activeTab, setActiveTab] = useState('generator');
+            const [prompts, setPrompts] = useState([]);
+            const [generatedResult, setGeneratedResult] = useState(null);
+            const [isSaving, setIsSaving] = useState(false);
+
+            // State Form
+            const [formData, setFormData] = useState({
+                aiModel: 'Midjourney',
+                platform: 'Instagram/Facebook',
+                sportsCategory: 'Futsal',
+                subject: '',
+                athletePose: '',
+                mood: 'Intense',
+                visualStyle: 'Photorealistic',
+                contentStyle: 'Nike Ad Style',
+                lighting: 'Dramatic',
+                angle: 'Low Angle'
+            });
+
+            // Auth & Database Listener
+            useEffect(() => {
+                signInAnonymously(auth).then((cred) => setUser(cred.user)).catch(console.error);
+                
+                // Realtime Listener
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'));
+                const unsub = onSnapshot(q, (snapshot) => {
+                    const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    // Sort descending (terbaru di atas)
+                    data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    setPrompts(data);
+                }, (error) => {
+                    console.log("Database permission error:", error);
+                });
+                return () => unsub();
+            }, []);
+
+            const handleInputChange = (e) => {
+                setFormData({...formData, [e.target.name]: e.target.value});
+            };
+
+            const handleGenerate = () => {
+                const { subject, sportsCategory, mood, platform, aiModel, contentStyle } = formData;
+                // Logika Prompt Sederhana
+                const prompt = `/imagine prompt: ${subject}, ${sportsCategory} context, ${mood} atmosphere, ${contentStyle}, for ${platform} --v 6.0`;
+                
+                setGeneratedResult({
+                    singleLine: prompt,
+                    aiModel: aiModel,
+                    createdAt: new Date().toISOString()
+                });
+            };
+
+            const handleSave = async () => {
+                if(!generatedResult) return;
+                setIsSaving(true);
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'prompts'), {
+                        ...formData,
+                        fullPrompt: generatedResult.singleLine,
+                        status: 'Idea',
+                        scheduledDate: '',
+                        createdAt: new Date().toISOString()
+                    });
+                    setIsSaving(false);
+                    setActiveTab('plan'); // Pindah tab otomatis
+                } catch(e) {
+                    console.error("Error saving:", e);
+                    alert("Gagal menyimpan. Pastikan Rules Firebase sudah diatur.");
+                    setIsSaving(false);
+                }
+            };
+
+            return (
+                <div className="w-full min-h-screen font-sans bg-black text-gray-200 p-4 md:p-8">
+                    <div className="max-w-5xl mx-auto">
+                        {/* Header */}
+                        <div className="text-center mb-8">
+                            <div className="flex items-center justify-center gap-3 mb-4">
+                                <div className="p-3 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl shadow-lg">
+                                    <Dumbbell className="text-white" size={32} />
+                                </div>
+                                <div className="text-left">
+                                    <h1 className="text-2xl font-black tracking-tighter text-white">HUDAN <span className="text-orange-500">CONTENT</span></h1>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500">Plan & Generator</p>
+                                </div>
+                            </div>
+                            <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+                        </div>
+
+                        {/* TAB: GENERATOR */}
+                        {activeTab === 'generator' && (
+                            <div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
+                                    <SectionHeader title="Konfigurasi" icon={<Zap size={16}/>} />
+                                    
+                                    <FormSelect label="Kategori" name="sportsCategory" value={formData.sportsCategory} onChange={handleInputChange} 
+                                        options={<><option>Futsal</option><option>Sepak Bola</option><option>Gym/Fitness</option></>} 
+                                    />
+                                    <FormSelect label="Mood" name="mood" value={formData.mood} onChange={handleInputChange} 
+                                        options={<><option>Intense</option><option>Victory</option><option>Dark</option></>} 
+                                    />
+                                    
+                                    <div className="mb-4">
+                                        <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5 ml-1">Subjek</label>
+                                        <textarea name="subject" onChange={handleInputChange} value={formData.subject} rows="3" className="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-sm focus:border-orange-500 outline-none" placeholder="Deskripsikan ide konten..."></textarea>
+                                    </div>
+
+                                    <button onClick={handleGenerate} className="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl font-bold text-white shadow-lg hover:shadow-orange-900/50 transition-all flex items-center justify-center gap-2">
+                                        <Wand2 size={20} /> Generate Prompt
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {generatedResult ? (
+                                        <div className="bg-gray-800 p-6 rounded-3xl border border-gray-700">
+                                            <div className="text-green-400 text-xs font-bold mb-2 uppercase">Result Ready</div>
+                                            <code className="block bg-black/40 p-4 rounded-xl text-green-300 text-sm font-mono break-words mb-4">
+                                                {generatedResult.singleLine}
+                                            </code>
+                                            <button onClick={handleSave} disabled={isSaving} className="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-bold text-white flex justify-center items-center gap-2">
+                                                {isSaving ? <RefreshCw className="animate-spin"/> : <Plus/>} Simpan ke Plan
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="h-full border-2 border-dashed border-gray-800 rounded-3xl flex flex-col items-center justify-center text-gray-600 p-8">
+                                            <Dumbbell size={40} className="mb-4 opacity-20"/>
+                                            <p className="text-sm">Prompt akan muncul di sini</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* TAB: CONTENT PLAN (DATABASE) */}
+                        {activeTab === 'plan' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {prompts.map(p => (
+                                        <div key={p.id} className="bg-gray-900 border border-gray-800 p-5 rounded-2xl hover:border-orange-500/30 transition-all group">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-[10px] font-bold uppercase bg-gray-800 px-2 py-1 rounded text-gray-400 border border-gray-700">{p.status || 'Idea'}</span>
+                                                <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'prompts', p.id))} className="text-gray-600 hover:text-red-500"><Trash2 size={14}/></button>
+                                            </div>
+                                            <h3 className="font-bold text-white mb-1 line-clamp-1">{p.subject || "Tanpa Judul"}</h3>
+                                            <p className="text-xs text-gray-500 line-clamp-2 mb-3 font-mono bg-black/20 p-2 rounded">{p.fullPrompt}</p>
+                                            <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                                                <Layout size={10}/> {p.platform}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {prompts.length === 0 && (
+                                        <div className="col-span-full text-center py-20 text-gray-600">Belum ada data di database.</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* TAB: CALENDAR */}
+                        {activeTab === 'calendar' && (
+                            <div className="text-center py-20 bg-gray-900 rounded-3xl border border-gray-800">
+                                <CalendarIcon size={48} className="mx-auto text-gray-700 mb-4"/>
+                                <h3 className="text-xl font-bold text-gray-300">Calendar View</h3>
+                                <p className="text-gray-500 text-sm mt-2">Fitur kalender akan membaca data tanggal dari Content Plan.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
